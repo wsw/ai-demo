@@ -1,0 +1,38 @@
+# 开发环境配置
+
+spring:
+  # 数据源配置
+  datasource:
+    url: jdbc:mysql://${DB_HOST:10.51.134.53}:${DB_PORT:3306}/template_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:secloud@mysql}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  
+  # JPA 配置
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # Flyway 配置
+  flyway:
+    clean-disabled: false  # 允许在开发环境清理数据库
+  
+  # 开发工具
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+
+# Actuator 配置
+management:
+  endpoint:
+    health:
+      show-details: always  # 开发环境显示完整健康信息

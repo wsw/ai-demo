@@ -1,0 +1,43 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: spring-modular-monolith-template
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  
+  # 数据源配置（由各环境覆盖）
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  # Flyway 配置
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+# Actuator 配置
+# management:
+#   endpoints:
+#     web:
+#       exposure:
+#         include: health,info,metrics,prometheus
+#   endpoint:
+#     health:
+#       show-details: when-authorized
+#   metrics:
+#     tags:
+#       application: ${spring.application.name}
+
+# 日志配置（由各环境覆盖）
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
