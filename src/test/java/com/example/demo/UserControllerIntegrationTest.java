@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@ActiveProfiles("demo")
+@ActiveProfiles("test")
 @DisplayName("用户控制器集成测试")
 class UserControllerIntegrationTest {
 

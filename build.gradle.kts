@@ -35,9 +35,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-kafka")
 //	implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	testImplementation("org.springframework.boot:spring-boot-starter-web") {
-		exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
-	}
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
 	implementation("org.springframework.modulith:spring-modulith-events-api")
@@ -64,14 +61,8 @@ dependencies {
 	implementation("org.hibernate.validator:hibernate-validator")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-restdocs")
-	testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-opentelemetry-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.springframework:spring-webmvc")
+	testImplementation("com.fasterxml.jackson.core:jackson-databind")
 }
 
 dependencyManagement {
