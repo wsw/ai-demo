@@ -3,6 +3,7 @@ package com.example.demo;
 import com.example.demo.application.dto.UserDTO;
 import com.example.demo.domain.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,8 @@ class UserControllerIntegrationTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
     
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule());
 
     private MockMvc mockMvc;
     private UserDTO.Request createUserRequest;
@@ -48,7 +49,7 @@ class UserControllerIntegrationTest {
     @Test
     @DisplayName("测试创建用户 - 成功")
     void createUser_Success() throws Exception {
-        mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(post("/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserRequest)))
                 .andExpect(status().isCreated())
@@ -63,7 +64,7 @@ class UserControllerIntegrationTest {
     @DisplayName("测试创建用户 - 用户名已存在")
     void createUser_DuplicateUsername() throws Exception {
         // 首先创建一个用户
-        mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(post("/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserRequest)))
                 .andExpect(status().isCreated());
@@ -75,11 +76,11 @@ class UserControllerIntegrationTest {
                 .password("password123")
                 .build();
 
-        mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(post("/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicateRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error", is("Bad Request")));
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error", is("USER_ALREADY_EXISTS")));
     }
 
     @Test
@@ -91,7 +92,7 @@ class UserControllerIntegrationTest {
                 .password("123") // 太短
                 .build();
 
-        mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(post("/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest())
@@ -102,7 +103,7 @@ class UserControllerIntegrationTest {
     @DisplayName("测试根据ID获取用户 - 成功")
     void getUserById_Success() throws Exception {
         // 首先创建一个用户
-        MvcResult createResult = mockMvc.perform(post("/api/v1/users")
+        MvcResult createResult = mockMvc.perform(post("/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserRequest)))
                 .andExpect(status().isCreated())
@@ -113,7 +114,7 @@ class UserControllerIntegrationTest {
                 UserDTO.Response.class);
 
         // 然后查询该用户
-        mockMvc.perform(get("/api/v1/users/{id}", createdUser.getId()))
+        mockMvc.perform(get("/v1/users/{id}", createdUser.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(createdUser.getId().intValue())))
                 .andExpect(jsonPath("$.username", is(createUserRequest.getUsername())));
@@ -122,9 +123,9 @@ class UserControllerIntegrationTest {
     @Test
     @DisplayName("测试根据ID获取用户 - 用户不存在")
     void getUserById_NotFound() throws Exception {
-        mockMvc.perform(get("/api/v1/users/{id}", 99999))
+        mockMvc.perform(get("/v1/users/{id}", 99999))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error", is("Not Found")));
+                .andExpect(jsonPath("$.error", is("USER_NOT_FOUND")));
     }
 
     @Test
@@ -138,14 +139,14 @@ class UserControllerIntegrationTest {
                     .password("password123")
                     .build();
 
-            mockMvc.perform(post("/api/v1/users")
+            mockMvc.perform(post("/v1/users")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated());
         }
 
         // 获取所有用户
-        mockMvc.perform(get("/api/v1/users"))
+        mockMvc.perform(get("/v1/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(3))));
     }
@@ -154,7 +155,7 @@ class UserControllerIntegrationTest {
     @DisplayName("测试更新用户 - 成功")
     void updateUser_Success() throws Exception {
         // 首先创建一个用户
-        MvcResult createResult = mockMvc.perform(post("/api/v1/users")
+        MvcResult createResult = mockMvc.perform(post("/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserRequest)))
                 .andExpect(status().isCreated())
@@ -171,7 +172,7 @@ class UserControllerIntegrationTest {
                 .status(User.UserStatus.INACTIVE)
                 .build();
 
-        mockMvc.perform(put("/api/v1/users/{id}", createdUser.getId())
+        mockMvc.perform(put("/v1/users/{id}", createdUser.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
@@ -184,7 +185,7 @@ class UserControllerIntegrationTest {
     @DisplayName("测试删除用户 - 成功")
     void deleteUser_Success() throws Exception {
         // 首先创建一个用户
-        MvcResult createResult = mockMvc.perform(post("/api/v1/users")
+        MvcResult createResult = mockMvc.perform(post("/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserRequest)))
                 .andExpect(status().isCreated())
@@ -195,11 +196,11 @@ class UserControllerIntegrationTest {
                 UserDTO.Response.class);
 
         // 删除用户
-        mockMvc.perform(delete("/api/v1/users/{id}", createdUser.getId()))
+        mockMvc.perform(delete("/v1/users/{id}", createdUser.getId()))
                 .andExpect(status().isNoContent());
 
         // 验证用户已被删除
-        mockMvc.perform(get("/api/v1/users/{id}", createdUser.getId()))
+        mockMvc.perform(get("/v1/users/{id}", createdUser.getId()))
                 .andExpect(status().isNotFound());
     }
 }
