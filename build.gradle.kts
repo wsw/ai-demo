@@ -33,7 +33,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-flyway")
 	implementation("org.springframework.boot:spring-boot-starter-kafka")
-	implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
+//	implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
@@ -52,6 +52,9 @@ dependencies {
 	
 	// H2 Database for demo/testing
 	runtimeOnly("com.h2database:h2")
+	
+	// Flyway MySQL support
+	implementation("org.flywaydb:flyway-mysql")
 	
 	// Validation
 	implementation("jakarta.validation:jakarta.validation-api")
@@ -91,4 +94,25 @@ tasks.test {
 tasks.asciidoctor {
 	inputs.dir(project.extra["snippetsDir"]!!)
 	dependsOn(tasks.test)
+}
+
+// 构建脚本的仓库配置
+buildscript {
+    repositories {
+        maven(url = "https://maven.aliyun.com/repository/public/")
+        maven(url = "https://maven.aliyun.com/repository/gradle-plugin/")
+        mavenCentral()
+        maven(url = "https://maven.aliyun.com/repository/google/")
+    }
+}
+
+// 项目依赖的仓库配置
+allprojects {
+    repositories {
+        maven(url = "https://maven.aliyun.com/repository/public/")
+        maven(url = "https://maven.aliyun.com/repository/google/")
+        maven(url = "https://maven.aliyun.com/repository/gradle-plugin/")
+        mavenCentral()
+        google()
+    }
 }
