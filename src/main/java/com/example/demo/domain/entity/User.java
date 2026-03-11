@@ -1,5 +1,6 @@
 package com.example.demo.domain.entity;
 
+import com.example.demo.domain.exception.InvalidUserOperationException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -50,6 +51,70 @@ public class User {
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
+
+    // ==================== 领域行为方法 ====================
+    
+    /**
+     * 激活用户
+     * 将用户状态从 INACTIVE 或 SUSPENDED 恢复为 ACTIVE
+     */
+    public void activate() {
+        if (this.status == UserStatus.DELETED) {
+            throw new InvalidUserOperationException("activate", "DELETED");
+        }
+        this.status = UserStatus.ACTIVE;
+    }
+    
+    /**
+     * 停用用户
+     * 将用户状态设置为 INACTIVE
+     */
+    public void deactivate() {
+        if (this.status == UserStatus.DELETED) {
+            throw new InvalidUserOperationException("deactivate", "DELETED");
+        }
+        this.status = UserStatus.INACTIVE;
+    }
+    
+    /**
+     * 冻结用户
+     * 将用户状态设置为 SUSPENDED，通常用于违规处罚
+     */
+    public void suspend() {
+        if (this.status == UserStatus.DELETED) {
+            throw new InvalidUserOperationException("suspend", "DELETED");
+        }
+        this.status = UserStatus.SUSPENDED;
+    }
+    
+    /**
+     * 更新最后登录时间
+     * 记录用户最后登录的时间
+     */
+    public void updateLastLoginTime() {
+        if (this.status == UserStatus.DELETED) {
+            throw new InvalidUserOperationException("login", "DELETED");
+        }
+        if (this.status == UserStatus.SUSPENDED) {
+            throw new InvalidUserOperationException("login", "SUSPENDED");
+        }
+        if (this.status == UserStatus.INACTIVE) {
+            throw new InvalidUserOperationException("login", "INACTIVE");
+        }
+        this.lastLoginAt = LocalDateTime.now();
+    }
+    
+    /**
+     * 软删除用户
+     * 将用户状态设置为 DELETED，不实际删除数据
+     */
+    public void softDelete() {
+        this.status = UserStatus.DELETED;
+        this.username = null;
+        this.email = null;
+        this.fullName = null;
+        this.phone = null;
+    }
 
     public enum UserStatus {
         ACTIVE, INACTIVE, SUSPENDED, DELETED

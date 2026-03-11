@@ -6,6 +6,7 @@
 
 - **Spring Boot 4.0.3** - 核心框架
 - **Spring Modulith 2.0.3** - 模块化单体架构
+- **Spring Security** - 密码加密 (BCrypt)
 - **Spring Data JPA** - 数据持久层
 - **Spring MVC** - REST API
 - **SpringDoc OpenAPI 3.0** - API 文档
@@ -22,7 +23,11 @@ src/main/java/com/example/demo/
 ├── DemoApplication.java          # 应用入口
 ├── domain/                       # 领域层
 │   ├── entity/                   # 实体类
-│   │   └── User.java
+│   │   └── User.java              # 用户实体（包含领域行为：activate/deactivate/suspend/softDelete）
+│   ├── exception/                # 领域异常
+│   │   ├── UserAlreadyExistsException.java
+│   │   ├── UserNotFoundException.java
+│   │   └── InvalidUserOperationException.java
 │   └── repository/               # 仓储接口
 │       └── UserRepository.java
 ├── application/                  # 应用层
@@ -36,9 +41,12 @@ src/main/java/com/example/demo/
 │       └── HealthController.java
 └── infrastructure/               # 基础设施层
     ├── config/                   # 配置类
-    │   └── OpenApiConfig.java
+    │   ├── OpenApiConfig.java
+    │   ├── SecurityConfig.java      # Spring Security 配置
+    │   └── UserProperties.java      # 用户配置属性
     └── exception/                # 异常处理
-        └── GlobalExceptionHandler.java
+        ├── GlobalExceptionHandler.java
+        └── BusinessException.java   # 业务异常基类
 
 src/main/resources/
 ├── application.yml               # 主配置
@@ -47,7 +55,8 @@ src/main/resources/
 ├── application-test.yml        # 测试环境
 ├── application-prod.yml        # 生产环境
 └── db/migration/               # Flyway 迁移脚本
-    └── V1__Create_users_table.sql
+    ├── V1__Create_users_table.sql
+    └── V2__Add_indexes_for_user_queries.sql
 
 src/test/
 ├── java/com/example/demo/

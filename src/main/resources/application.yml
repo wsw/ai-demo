@@ -41,3 +41,17 @@ spring:
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# 应用配置
+app:
+  user:
+    username-min-length: 3
+    username-max-length: 50
+    username-pattern: "^[a-zA-Z0-9_]+$"
+    password-min-length: 6
+    password-max-length: 255
+    email-max-length: 100
+    full-name-max-length: 100
+    phone-pattern: "^$|^[0-9\\-\\+\\s()]+$"
+    default-page-size: 10
+    max-page-size: 100

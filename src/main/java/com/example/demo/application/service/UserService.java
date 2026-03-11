@@ -2,12 +2,14 @@ package com.example.demo.application.service;
 
 import com.example.demo.application.dto.UserDTO;
 import com.example.demo.domain.entity.User;
+import com.example.demo.domain.exception.UserAlreadyExistsException;
+import com.example.demo.domain.exception.UserNotFoundException;
 import com.example.demo.domain.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserDTO.Response createUser(UserDTO.Request request) {
@@ -29,19 +32,19 @@ public class UserService {
 
         // 检查用户名是否已存在
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already exists: " + request.getUsername());
+            throw new UserAlreadyExistsException(request.getUsername());
         }
 
         // 检查邮箱是否已存在
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists: " + request.getEmail());
+            throw new UserAlreadyExistsException(request.getUsername(), request.getEmail());
         }
 
-        // 创建用户实体（实际项目中密码需要加密）
+        // 创建用户实体，密码使用 BCrypt 加密（日志中不记录密码）
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(request.getPassword()) // 实际项目中需要使用 PasswordEncoder 加密
+                .password(passwordEncoder.encode(request.getPassword()))
                 .fullName(request.getFullName())
                 .phone(request.getPhone())
                 .status(User.UserStatus.ACTIVE)
@@ -56,14 +59,14 @@ public class UserService {
     public UserDTO.Response getUserById(Long id) {
         log.info("Fetching user by ID: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
         return UserDTO.Response.fromEntity(user);
     }
 
     public UserDTO.Response getUserByUsername(String username) {
         log.info("Fetching user by username: {}", username);
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> new UserNotFoundException(username));
         return UserDTO.Response.fromEntity(user);
     }
 
@@ -90,7 +93,7 @@ public class UserService {
     public UserDTO.Response updateUser(Long id, UserDTO.UpdateRequest request) {
         log.info("Updating user with ID: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         // 更新字段
         if (request.getFullName() != null) {
@@ -113,7 +116,7 @@ public class UserService {
     public void deleteUser(Long id) {
         log.info("Deleting user with ID: {}", id);
         if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("User not found with ID: " + id);
+            throw new UserNotFoundException(id);
         }
         userRepository.deleteById(id);
         log.info("User deleted successfully with ID: {}", id);
@@ -122,7 +125,7 @@ public class UserService {
     @Transactional
     public void updateLastLoginTime(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
     }

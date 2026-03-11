@@ -1,5 +1,8 @@
 package com.example.demo.infrastructure.exception;
 
+import com.example.demo.domain.exception.InvalidUserOperationException;
+import com.example.demo.domain.exception.UserAlreadyExistsException;
+import com.example.demo.domain.exception.UserNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,54 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        log.warn("User already exists: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                ex.getStatusCode(),
+                ex.getErrorCode(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+        log.warn("User not found: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                ex.getStatusCode(),
+                ex.getErrorCode(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidUserOperationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidUserOperation(InvalidUserOperationException ex) {
+        log.warn("Invalid user operation: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                ex.getStatusCode(),
+                ex.getErrorCode(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
+        log.warn("Business exception: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                ex.getStatusCode(),
+                ex.getErrorCode(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.valueOf(ex.getStatusCode()));
+    }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {

@@ -3,9 +3,9 @@
 spring:
   # 数据源配置
   datasource:
-    url: jdbc:mysql://${DB_HOST:10.51.134.53}:${DB_PORT:3306}/template_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/template_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:secloud@mysql}
+    password: ${DB_PASSWORD:password}
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
