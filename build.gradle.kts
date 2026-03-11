@@ -21,12 +21,12 @@ configurations {
 	}
 }
 
+extra["snippetsDir"] = file("build/generated-snippets")
+extra["springModulithVersion"] = "2.0.3"
+
 repositories {
 	mavenCentral()
 }
-
-extra["snippetsDir"] = file("build/generated-snippets")
-extra["springModulithVersion"] = "2.0.3"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -34,7 +34,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-flyway")
 	implementation("org.springframework.boot:spring-boot-starter-kafka")
 //	implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
-	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	testImplementation("org.springframework.boot:spring-boot-starter-web") {
+		exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
+	}
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
 	implementation("org.springframework.modulith:spring-modulith-events-api")
@@ -67,14 +70,8 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-opentelemetry-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-	testImplementation("org.springframework.boot:spring-boot-testcontainers")
-	testImplementation("org.springframework.modulith:spring-modulith-starter-test")
-	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-	testImplementation("org.testcontainers:testcontainers-grafana")
-	testImplementation("org.testcontainers:testcontainers-junit-jupiter")
-	testImplementation("org.testcontainers:testcontainers-kafka")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework:spring-webmvc")
 }
 
 dependencyManagement {
@@ -106,13 +103,3 @@ buildscript {
     }
 }
 
-// 项目依赖的仓库配置
-allprojects {
-    repositories {
-        maven(url = "https://maven.aliyun.com/repository/public/")
-        maven(url = "https://maven.aliyun.com/repository/google/")
-        maven(url = "https://maven.aliyun.com/repository/gradle-plugin/")
-        mavenCentral()
-        google()
-    }
-}
