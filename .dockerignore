@@ -1,0 +1,54 @@
+# Gradle
+.gradle/
+build/
+!gradlew
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project/
+.classpath
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Test
+src/test/
+**/test/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# BMAD
+_bmad/
+_bmad-output/
+.opencode/
+
+# Environment
+.env
+.env.local
+*.env
+
+# Misc
+*.bak
+*.tmp
+target/

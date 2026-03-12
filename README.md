@@ -15,6 +15,8 @@
 - **MySQL** - 生产数据库
 - **Lombok** - 代码简化
 - **JUnit 5 + Mockito** - 单元测试
+- **Docker** - 容器化部署
+- **Jib** - Docker 镜像构建
 
 ## 项目结构
 
@@ -235,6 +237,85 @@ server:
 - 检查 MySQL 是否正在运行
 - 检查数据库配置（URL、用户名、密码）
 - 检查网络连接和防火墙设置
+
+## Docker 部署
+
+### 方式一：使用 Jib 插件构建（推荐）
+
+```bash
+# 构建 Docker 镜像
+./gradlew jibDockerBuild
+
+# 查看镜像
+docker images demo
+
+# 运行容器
+docker run -d -p 8080:8080 --name demo-app demo:latest
+
+# 查看日志
+docker logs -f demo-app
+
+# 健康检查
+curl http://localhost:8080/actuator/health
+
+# 停止容器
+docker stop demo-app && docker rm demo-app
+```
+
+### 方式二：使用 Dockerfile 构建
+
+```bash
+# 构建 Docker 镜像
+docker build -t demo:latest .
+
+# 运行容器
+docker run -d -p 8080:8080 --name demo-app demo:latest
+```
+
+### 方式三：使用 Docker Compose（最简单）
+
+```bash
+# 启动应用（后台运行）
+docker-compose up -d
+
+# 查看状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f app
+
+# 访问应用
+# Swagger UI: http://localhost:8080/swagger-ui.html
+# API 文档：http://localhost:8080/v3/api-docs
+# 健康检查：http://localhost:8080/actuator/health
+
+# 停止应用
+docker-compose down
+
+# 清理（包括数据卷）
+docker-compose down -v
+```
+
+### 镜像信息
+
+- **基础镜像**: eclipse-temurin:21-jre-alpine（约 200MB）
+- **暴露端口**: 8080 (HTTP), 8081 (Management)
+- **健康检查**: /actuator/health
+- **JVM 参数**: -Xms256m -Xmx512m
+
+### 环境变量
+
+| 变量名 | 说明 | 默认值 |
+| ------ | ---- | ------ |
+| SPRING_PROFILES_ACTIVE | Spring Profile | prod |
+| TZ | 时区 | Asia/Shanghai |
+| DB_HOST | 数据库主机 | localhost |
+| DB_PORT | 数据库端口 | 3306 |
+| DB_NAME | 数据库名称 | demo |
+| DB_USERNAME | 数据库用户名 | root |
+| DB_PASSWORD | 数据库密码 | - |
+
+---
 
 ## 贡献指南
 

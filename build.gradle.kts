@@ -3,6 +3,7 @@ plugins {
 	id("org.springframework.boot") version "4.0.3"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.asciidoctor.jvm.convert") version "4.0.5"
+	id("com.google.cloud.tools.jib") version "3.4.0"
 }
 
 group = "com.example"
@@ -67,6 +68,42 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom("org.springframework.modulith:spring-modulith-bom:${property("springModulithVersion")}")
+	}
+}
+
+// Jib Docker 镜像配置
+jib {
+	from {
+		image = "eclipse-temurin:21-jre-alpine"
+		platforms {
+			platform {
+				os = "linux"
+				architecture = "amd64"
+			}
+		}
+	}
+	to {
+		image = "demo:0.0.1-SNAPSHOT"
+		tags = setOf("latest", version.toString())
+	}
+	container {
+		ports = listOf("8080", "8081")
+		labels = mapOf(
+			"maintainer" to "Weishuwen",
+			"version" to version.toString()
+		)
+		jvmFlags = listOf(
+			"-Xms256m",
+			"-Xmx512m",
+			"-XX:+UseG1GC",
+			"-Djava.security.egd=file:/dev/./urandom",
+			"-Duser.timezone=Asia/Shanghai"
+		)
+		environment = mapOf(
+			"SPRING_PROFILES_ACTIVE" to "prod",
+			"TZ" to "Asia/Shanghai"
+		)
+		creationTime = "USE_CURRENT_TIMESTAMP"
 	}
 }
 
