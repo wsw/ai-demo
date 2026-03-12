@@ -71,10 +71,10 @@ dependencyManagement {
 	}
 }
 
-// Jib Docker 镜像配置
+// Jib Docker 镜像配置（使用阿里云镜像加速）
 jib {
 	from {
-		image = "eclipse-temurin:21-jre-alpine"
+		image = "registry.cn-hangzhou.aliyuncs.com/library/eclipse-temurin:21-jre-alpine"
 		platforms {
 			platform {
 				os = "linux"
