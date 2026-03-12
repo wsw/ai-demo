@@ -71,10 +71,15 @@ dependencyManagement {
 	}
 }
 
-// Jib Docker 镜像配置（使用阿里云镜像加速）
+// Jib Docker 镜像配置
+// 镜像源选项（根据网络环境选择）:
+//   1. Docker Hub (官方): eclipse-temurin:21-jre-alpine
+//   2. 腾讯云 (免费): ccr.ccs.tencentyun.com/library/eclipse-temurin:21-jre-alpine
+//   3. 华为云 (免费): swr.cn-east-2.myhuaweicloud.com/library/eclipse-temurin:21-jre-alpine
+//   4. 阿里云 (需认证): registry.cn-hangzhou.aliyuncs.com/library/eclipse-temurin:21-jre-alpine
 jib {
 	from {
-		image = "registry.cn-hangzhou.aliyuncs.com/library/eclipse-temurin:21-jre-alpine"
+		image = "eclipse-temurin:21-jre-alpine"
 		platforms {
 			platform {
 				os = "linux"

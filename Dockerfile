@@ -1,9 +1,13 @@
 # ==================== 多阶段构建 Dockerfile ====================
 # 作为 Jib 插件的备用方案，适用于需要自定义构建逻辑的场景
-# 使用阿里云镜像加速：registry.cn-hangzhou.aliyuncs.com
+# 镜像源选项（根据网络环境选择）:
+#   1. Docker Hub (官方): eclipse-temurin:21-jdk-alpine
+#   2. 阿里云 (需认证): registry.cn-hangzhou.aliyuncs.com/library/eclipse-temurin:21-jdk-alpine
+#   3. 腾讯云 (免费): ccr.ccs.tencentyun.com/library/eclipse-temurin:21-jdk-alpine
+#   4. 华为云 (免费): swr.cn-east-2.myhuaweicloud.com/library/eclipse-temurin:21-jdk-alpine
 
 # ==================== Stage 1: 构建阶段 ====================
-FROM registry.cn-hangzhou.aliyuncs.com/library/eclipse-temurin:21-jdk-alpine AS builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -24,7 +28,7 @@ COPY src ./src
 RUN ./gradlew bootJar --no-daemon -x test
 
 # ==================== Stage 2: 运行阶段 ====================
-FROM registry.cn-hangzhou.aliyuncs.com/library/eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 # 设置维护者信息
 LABEL maintainer="Weishuwen"
