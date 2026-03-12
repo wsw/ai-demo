@@ -72,6 +72,11 @@ dependencyManagement {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	// 添加 Mockito agent 支持 Java 21
+	jvmArgs = listOf(
+		"-XX:+EnableDynamicAgentLoading",
+		"-Xshare:off"
+	)
 }
 
 tasks.test {
